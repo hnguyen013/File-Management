@@ -8,11 +8,15 @@ class FileSystemTree:
         self.current_working_dir = self.root
     
     def mkdir(self, name):
+        if self.current_working_dir.children.find_by_name(name):
+            raise ValueError("Name already exists in this directory.")
         folder = Node(name=name,is_folder=True)
         folder.parent = self.current_working_dir
         self.current_working_dir.children.append(folder)
 
     def create_file(self,name,size):
+        if self.current_working_dir.children.find_by_name(name):
+            raise ValueError("Name already exists in this directory.")
         file = Node(name=name,is_folder=False,size=size)
         file.parent = self.current_working_dir
         self.current_working_dir.children.append(file)
