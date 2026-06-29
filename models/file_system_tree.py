@@ -1,5 +1,7 @@
 from models.node import Node
-
+import os
+from datetime import datetime
+import json
 
 class FileSystemTree:
 
@@ -106,5 +108,42 @@ class FileSystemTree:
                 child.name = new_name
                 return True
         return False
+    
     def go_root(self):
         self.current_working_dir = self.root
+
+    def save_to_json(self, file_path="data.json"):
+        try:
+            data = self.root.to_dict()
+            with open(file_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            print(f"Lỗi khi lưu: {e}")
+
+    def load_from_json(self, file_path="data.json"):
+        if not os.path.exists(file_path):
+            print("Chưa có file dữ liệu, khởi tạo cây trống.")
+            return False
+            
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            def _dict_to_node(d):
+                node = Node(name=d["name"], is_folder=d["is_folder"], size=d["size"])
+                if "created_at" in d:
+                    node.created_at = datetime.fromisoformat(d["created_at"])
+                
+                if node.is_folder and "children" in d:
+                    for child_dict in d["children"]:
+                        child_node = _dict_to_node(child_dict)
+                        child_node.parent = node  # Gắn lại liên kết cha
+                        node.children.append(child_node)  # Thêm vào LinkedList con
+                return node
+
+            self.root = _dict_to_node(data)
+            self.current_working_dir = self.root
+            print("Đã tải dữ liệu từ file JSON thành công.")
+            return True
+        except Exception as e:
+            print(f"Lỗi khi đọc JSON: {e}")
+            return False

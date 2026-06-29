@@ -33,6 +33,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setStyleSheet(APP_STYLE)
         self.fs = FileSystemTree()
+        self.fs.load_from_json() # Đọc dữ liệu JSON cũ lên nếu có
 
         self.setWindowTitle("File System Management")
         self.setGeometry(100, 50, 1200, 750)
@@ -166,7 +167,6 @@ class MainWindow(QMainWindow):
         self.table_widget.customContextMenuRequested.connect(self.show_context_menu)
 
     def format_size(self, size_in_bytes):
-        """Hàm phụ trợ quy đổi số lượng bytes sang đơn vị KB, MB, GB thông minh"""
         try:
             size = float(size_in_bytes)
         except (ValueError, TypeError):
@@ -174,7 +174,6 @@ class MainWindow(QMainWindow):
             
         for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
             if size < 1024.0:
-                # Nếu là đơn vị Byte (B) thì không cần hiện dấu thập phân
                 if unit == 'B':
                     return f"{int(size)} {unit}"
                 return f"{size:.2f} {unit}"
@@ -227,7 +226,7 @@ class MainWindow(QMainWindow):
             created_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             self.table_widget.setItem(row, 2, created_item)
 
-            # Cột Size: Thư mục để dấu "-", File áp dụng format_size()
+            # Cột Size
             if child.get_type() == "Folder":
                 size_text = "-"
             else:
@@ -242,6 +241,7 @@ class MainWindow(QMainWindow):
         if ok and name:
             try:
                 self.fs.mkdir(name)
+                self.fs.save_to_json()  # <-- Tự động lưu sau khi tạo folder
                 self.refresh_view()
             except ValueError as e:
                 QMessageBox.warning(self, "Error", str(e))
@@ -253,6 +253,7 @@ class MainWindow(QMainWindow):
             if ok_size:
                 try:
                     self.fs.create_file(name, size)
+                    self.fs.save_to_json()  # <-- Tự động lưu sau khi tạo file
                     self.refresh_view()
                 except ValueError as e:
                     QMessageBox.warning(self, "Error", str(e))
@@ -266,6 +267,7 @@ class MainWindow(QMainWindow):
         name = self.table_widget.item(selected_row, 0).text()
         result = self.fs.delete(name)
         if result:
+            self.fs.save_to_json()  # <-- Tự động lưu sau khi xóa thành công
             self.refresh_view()
         else:
             QMessageBox.warning(self, "Error", "Cannot delete item")
@@ -280,12 +282,6 @@ class MainWindow(QMainWindow):
             return
 
         results = self.fs.search_all(name)
-        if not ...:
-            pass
-
-        if not ...:
-            pass
-
         if not results:
             QMessageBox.warning(self, "Not Found", "Item not found")
             return
@@ -383,6 +379,7 @@ class MainWindow(QMainWindow):
             return
         try:
             self.fs.rename(old_name, new_name)
+            self.fs.save_to_json()  # <-- Tự động lưu sau khi đổi tên thành công
             self.refresh_view()
         except ValueError as e:
             QMessageBox.warning(self, "Error", str(e))
@@ -407,7 +404,6 @@ class MainWindow(QMainWindow):
         self.info_name.setText(f"Name: {selected_item.name}")
         self.info_type.setText(f"Type: {selected_item.get_type()}")
         
-        # Phần thông tin tổng dung lượng ở Info Panel bên dưới sẽ tự format sang B/KB/MB/GB cho cả Folder và File
         formatted_total_size = self.format_size(selected_item.get_size())
         self.info_size.setText(f"Size: {formatted_total_size}")
         
@@ -419,3 +415,11 @@ class MainWindow(QMainWindow):
         else:
             full_path = f"{current_path}/{selected_item.name}"
         self.info_path.setText(f"Path: {full_path}")
+
+    def closeEvent(self, event):
+        """Bắt sự kiện tắt ứng dụng để đảm bảo toàn bộ dữ liệu được lưu lại một lần nữa."""
+        try:
+            self.fs.save_to_json()
+        except Exception as e:
+            print(f"Lỗi khi lưu dữ liệu trước khi đóng app: {e}")
+        event.accept()

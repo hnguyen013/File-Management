@@ -26,3 +26,14 @@ class Node:
     
     def get_created_at(self):
         return self.created_at.strftime("%d/%m/%Y %H:%M")
+    
+    def to_dict(self):
+        node_dict = {
+            "name": self.name,
+            "is_folder": self.is_folder,
+            "size": self.size,
+            "created_at": self.created_at.isoformat()  # Lưu datetime dưới dạng chuỗi ISO
+        }
+        if self.is_folder:
+            node_dict["children"] = [child.to_dict() for child in self.children]
+        return node_dict

@@ -1,0 +1,48 @@
+{
+    "name": "/",
+    "is_folder": true,
+    "size": 0,
+    "created_at": "2026-06-26T20:00:00",
+    "children": [
+        {
+            "name": "Documents",
+            "is_folder": true,
+            "size": 0,
+            "created_at": "2026-06-26T20:05:00",
+            "children": [
+                {
+                    "name": "Baitap_Python.txt",
+                    "is_folder": false,
+                    "size": 1024,
+                    "created_at": "2026-06-26T20:10:00"
+                },
+                {
+                    "name": "Project_Specs.docx",
+                    "is_folder": false,
+                    "size": 51200,
+                    "created_at": "2026-06-26T20:12:00"
+                }
+            ]
+        },
+        {
+            "name": "Pictures",
+            "is_folder": true,
+            "size": 0,
+            "created_at": "2026-06-26T20:06:00",
+            "children": [
+                {
+                    "name": "avatar.png",
+                    "is_folder": false,
+                    "size": 204800,
+                    "created_at": "2026-06-26T20:15:00"
+                }
+            ]
+        },
+        {
+            "name": "note.txt",
+            "is_folder": false,
+            "size": 256,
+            "created_at": "2026-06-26T20:02:00"
+        }
+    ]
+}
