@@ -21,9 +21,10 @@ from PyQt6.QtWidgets import (
     QStyle,
     QAbstractItemView,
     QGroupBox,
+    QTextEdit,
+    QDialog,
 )
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QIcon
 
 from models.file_system_tree import FileSystemTree
 
@@ -58,18 +59,19 @@ class MainWindow(QMainWindow):
         self.btn_new_file = QPushButton("New File")
         self.btn_rename = QPushButton("Rename")
         self.btn_delete = QPushButton("Delete")
-        self.btn_refresh = QPushButton("Refresh")
+        self.btn_view_tree = QPushButton("Tree")
+        self.btn_view_tree.setIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_FileDialogListView))
+        button_layout.addWidget(self.btn_view_tree)
 
         self.btn_new_folder.setIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon))
         self.btn_new_file.setIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_FileIcon))
         self.btn_delete.setIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_TrashIcon))
-        self.btn_refresh.setIcon(QApplication.style().standardIcon(QStyle.StandardPixmap.SP_BrowserReload))
+        self.btn_view_tree.clicked.connect(self.show_text_tree_dialog)
 
         button_layout.addWidget(self.btn_new_folder)
         button_layout.addWidget(self.btn_new_file)
         button_layout.addWidget(self.btn_rename)
         button_layout.addWidget(self.btn_delete)
-        button_layout.addWidget(self.btn_refresh)
         
         button_layout.addStretch()
         
@@ -155,7 +157,6 @@ class MainWindow(QMainWindow):
         self.btn_new_folder.clicked.connect(self.add_folder)
         self.btn_new_file.clicked.connect(self.add_file)
         self.btn_delete.clicked.connect(self.delete_item)
-        self.btn_refresh.clicked.connect(self.refresh_view)
         self.sort_combo.currentIndexChanged.connect(self.refresh_view)
         self.btn_back.clicked.connect(self.go_back)
         self.btn_root.clicked.connect(self.go_root)
@@ -416,8 +417,38 @@ class MainWindow(QMainWindow):
             full_path = f"{current_path}/{selected_item.name}"
         self.info_path.setText(f"Path: {full_path}")
 
+    def show_text_tree_dialog(self):
+        """Tạo một cửa sổ phụ hiển thị sơ đồ cây ký tự được tính toán từ backend."""
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Hệ thống phân cấp tệp tin (Thuật toán DFS)")
+        dialog.setMinimumSize(500, 600)
+        
+        layout = QVBoxLayout()
+        
+        # Tạo ô hiển thị văn bản lớn
+        text_edit = QTextEdit()
+        text_edit.setReadOnly(True)  # Chỉ cho đọc, không cho sửa
+        
+        # Ép font chữ dạng Monospace (Courier New) để các ký tự |-- không bị lệch hàng
+        text_edit.setStyleSheet("""
+            QTextEdit {
+                font-family: 'Courier New', monospace;
+                font-size: 13px;
+                background-color: #1e1e1e;
+                color: #ffffff;
+                border: 1px solid #333333;
+            }
+        """)
+        
+        # Gọi hàm thuật toán từ FileSystemTree và đẩy chuỗi dữ liệu lên giao diện
+        tree_string = self.fs.tree_to_string()
+        text_edit.setText(tree_string)
+        
+        layout.addWidget(text_edit)
+        dialog.setLayout(layout)
+        dialog.exec()
+
     def closeEvent(self, event):
-        """Bắt sự kiện tắt ứng dụng để đảm bảo toàn bộ dữ liệu được lưu lại một lần nữa."""
         try:
             self.fs.save_to_json()
         except Exception as e:

@@ -73,18 +73,21 @@ class FileSystemTree:
             results.append(node)
         for child in node.children:
             self._dfs_search_all(child,name,results)
-    
-    def tree(self):
-        self._print_tree(self.root,"")
 
-    def _print_tree(self,node,prefix):
-        print(prefix + node.name)
+
+    def tree_to_string(self):
+        result = []
+        self._tree_to_string_recursive(self.root, "", result)
+        return "\n".join(result)
+    
+    def _tree_to_string_recursive(self, node, prefix, result):
+        result.append(prefix + node.name)
         children = list(node.children)
         for i, child in enumerate(children):
             if i == len(children) - 1:
-                self._print_tree(child,prefix + "    ")
+                self._tree_to_string_recursive(child, prefix + "    ", result)
             else:
-                self._print_tree(child,prefix + "|   ")
+                self._tree_to_string_recursive(child, prefix + "|   ", result)
     
     def delete_recursive(self,node):
         for child in list(node.children):
@@ -136,8 +139,8 @@ class FileSystemTree:
                 if node.is_folder and "children" in d:
                     for child_dict in d["children"]:
                         child_node = _dict_to_node(child_dict)
-                        child_node.parent = node  # Gắn lại liên kết cha
-                        node.children.append(child_node)  # Thêm vào LinkedList con
+                        child_node.parent = node
+                        node.children.append(child_node) 
                 return node
 
             self.root = _dict_to_node(data)

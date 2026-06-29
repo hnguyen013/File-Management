@@ -21,6 +21,20 @@
                     "is_folder": false,
                     "size": 51200,
                     "created_at": "2026-06-26T20:12:00"
+                },
+                {
+                    "name": "Kien truc",
+                    "is_folder": true,
+                    "size": 0,
+                    "created_at": "2026-06-29T12:21:40.019852",
+                    "children": [
+                        {
+                            "name": "so_do.png",
+                            "is_folder": false,
+                            "size": 423211,
+                            "created_at": "2026-06-29T12:21:57.303587"
+                        }
+                    ]
                 }
             ]
         },
@@ -35,6 +49,24 @@
                     "is_folder": false,
                     "size": 204800,
                     "created_at": "2026-06-26T20:15:00"
+                },
+                {
+                    "name": "anh1.png",
+                    "is_folder": false,
+                    "size": 400000,
+                    "created_at": "2026-06-29T12:24:41.601991"
+                },
+                {
+                    "name": "anh2.png",
+                    "is_folder": false,
+                    "size": 43333,
+                    "created_at": "2026-06-29T12:24:48.982152"
+                },
+                {
+                    "name": "anh.png",
+                    "is_folder": false,
+                    "size": 656666,
+                    "created_at": "2026-06-29T12:25:20.660168"
                 }
             ]
         },
@@ -43,6 +75,12 @@
             "is_folder": false,
             "size": 256,
             "created_at": "2026-06-26T20:02:00"
+        },
+        {
+            "name": "file1.pdf",
+            "is_folder": false,
+            "size": 3333,
+            "created_at": "2026-06-29T13:23:51.738413"
         }
     ]
 }
